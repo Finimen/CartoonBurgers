@@ -20,10 +20,9 @@ func NewMenuRepository(ctx context.Context) (*MenuPerository, error) {
 	err := repo.Init(ctx)
 	if err != nil {
 		fmt.Print("INIT ERROR")
-		fmt.Print("INIT ERROR")
-		fmt.Print("INIT ERROR")
+		return nil, err
 	}
-	return repo, err
+	return repo, nil
 }
 
 func (prod *MenuPerository) Init(ctx context.Context) error {

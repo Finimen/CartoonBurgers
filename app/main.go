@@ -16,6 +16,9 @@ func main() {
 	api := r.Group("/api")
 	{
 		api.GET("/menu", handlers.GetMenuHandler)
+		api.POST("/register", handlers.GetLoginHandler)
+		api.POST("/login", handlers.GetLoginHandler)
+		api.GET("/profile", handlers.GetMiddlewareHadnler)
 	}
 
 	r.NoRoute(func(ctx *gin.Context) {

@@ -9,6 +9,7 @@ class MenuApp {
     init() {
         this.loadMenu();
         this.setupFilters();
+        this.setupAuthModals(); 
     }
 
     async loadMenu() {
@@ -31,6 +32,14 @@ class MenuApp {
         }
     }
 
+    setupAuthModals() {
+        window.addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal')) {
+                this.closeModals();
+            }
+        });
+    }
+
     showSkeleton(count) {
         this.menuContainer.innerHTML = Array(count).fill(`
             <div class="product-card skeleton"></div>
@@ -40,13 +49,16 @@ class MenuApp {
     renderMenu(products) {
         this.menuContainer.innerHTML = products.map(product => `
             <div class="product-card" data-category="${product.category}">
-            <div class="product-image" style="background-image: url('/static/images/${product.id}.png')"></div>
+            <div class="product-image" style="background-image: url('/static/images/${product.id}.png')">
+                ${product.type === 1 ? '<div class="badge-new">НОВИНКА!</div>' : ''}
+            </div>
             <h3>${product.name}</h3>
             <div class="price">${product.price} ₽</div>
-            <div class="description">Колличество: ${product.count} шт.</div>
+            <div class="description">Количество: ${product.count} шт.</div>
             <button class="add-btn" data-id="${product.id}">
                 Добавить в корзину
             </button>
+        </div>
         </div>
         `).join('');
 
@@ -109,9 +121,128 @@ class MenuApp {
             btn.textContent = 'Добавить в корзину';
         }, 2000);
     }
+
+    setupAuthModals() {
+        window.addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal')) {
+                this.closeModals();
+            }
+        });
+    }
+
+    showLoginModal() {
+        document.getElementById('loginModal').style.display = 'block';
+    }
+
+    showRegisterModal() {
+        document.getElementById('registerModal').style.display = 'block';
+    }
+
+    closeModals() {
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.style.display = 'none';
+        });
+    }
+
+    async handleLogin(event) {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        const data = {
+            username: formData.get('username'),
+            password: formData.get('password')
+        };
+
+        try {
+            const response = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            
+            if (response.ok) {
+                const { token } = await response.json();
+                localStorage.setItem('token', token);
+                this.closeModals();
+                this.updateAuthUI();
+            } else {
+                alert('Ошибка входа');
+            }
+        } catch (error) {
+            console.error('Login error:', error);
+        }
+    }
+
+    async handleRegister(event) {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        const data = {
+            username: formData.get('username'),
+            email: formData.get('email'),
+            password: formData.get('password')
+        };
+
+        try {
+            const response = await fetch('/api/auth/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            
+            if (response.ok) {
+                alert('Регистрация успешна! Теперь войдите.');
+                this.closeModals();
+                this.showLoginModal();
+            } else {
+                alert('Ошибка регистрации');
+            }
+        } catch (error) {
+            console.error('Register error:', error);
+        }
+    }
+
+    updateAuthUI() {
+        const token = localStorage.getItem('token');
+        if (token) {
+            // Показываем email пользователя и кнопку выхода
+        } else {
+            // Показываем кнопки входа/регистрации
+        }
+    }
 }
 
 // Запуск приложения
 document.addEventListener('DOMContentLoaded', () => {
-    new MenuApp();
+    window.app = new MenuApp();
 });
+
+function showLoginModal() {
+    if (window.app) {
+        window.app.showLoginModal();
+    }
+}
+
+function showRegisterModal() {
+    if (window.app) {
+        window.app.showRegisterModal();
+    }
+}
+
+function handleLogin(event) {
+    event.preventDefault();
+    if (window.app) {
+        window.app.handleLogin(event);
+    }
+}
+
+function handleRegister(event) {
+    event.preventDefault();
+    if (window.app) {
+        window.app.handleRegister(event);
+    }
+}
+
+function closeModals() {
+    if (window.app) {
+        window.app.closeModals();
+    }
+}

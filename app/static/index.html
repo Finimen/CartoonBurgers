@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="static/style.css">
 </head>
 <body>
+
     <div class="container">
         <header>
             <h1>BURGER <span>SPACE</span></h1>
@@ -14,6 +15,10 @@
                 <a href="#" class="active">Меню</a>
                 <a href="#">Корзина</a>
                 <a href="#">Профиль</a>
+                <div class="auth-buttons">
+                    <button class="auth-btn" onclick="app.showLoginModal()">Войти</button>
+                    <button class="auth-btn primary" onclick="app.showRegisterModal()">Регистрация</button>
+                </div>
             </nav>
         </header>
 
@@ -33,5 +38,30 @@
     </div>
 
     <script src="static/app.js"></script>
+    <div id="loginModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModals()">&times;</span>
+        <h2>Вход</h2>
+        <form id="loginForm" onsubmit="handleLogin(event)">
+            <input type="text" name="username" placeholder="Имя пользователя" required>
+            <input type="password" name="password" placeholder="Пароль" required>
+            <button type="submit">Войти</button>
+        </form>
+    </div>
+</div>
+
+<!-- Модальное окно регистрации -->
+<div id="registerModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModals()">&times;</span>
+        <h2>Регистрация</h2>
+        <form id="registerForm" onsubmit="handleRegister(event)">
+            <input type="text" name="username" placeholder="Имя пользователя" required>
+            <input type="email" name="email" placeholder="Email" required>
+            <input type="password" name="password" placeholder="Пароль" required>
+            <button type="submit">Зарегистрироваться</button>
+        </form>
+    </div>
+</div>
 </body>
 </html>
