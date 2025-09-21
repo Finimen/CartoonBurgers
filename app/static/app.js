@@ -1,5 +1,6 @@
 class MenuApp {
     constructor() {
+        this.cart = [];
         this.menuContainer = document.getElementById('menu-container');
         this.filters = document.querySelectorAll('.filter-btn');
         this.currentCategory = 'all';
@@ -10,27 +11,59 @@ class MenuApp {
         this.loadMenu();
         this.setupFilters();
         this.setupAuthModals(); 
+        this.setupNavigation();
     }
 
-    async loadMenu() {
-        try {
-            this.showSkeleton(6); // Показываем 6 скелетонов
-            
-            const response = await fetch('/api/menu');
-            if (!response.ok) throw new Error('Ошибка загрузки меню');
-            
-            const products = await response.json();
-            this.renderMenu(products);
-        } catch (error) {
-            console.error('Error:', error);
-            this.menuContainer.innerHTML = `
-                <div class="error">
-                    <p>😕 Не удалось загрузить меню</p>
-                    <button onclick="location.reload()">Попробовать снова</button>
-                </div>
-            `;
-        }
+    setupNavigation() {
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const section = e.target.dataset.section;
+                this.showSection(section);
+            });
+        });
     }
+
+    showSection(sectionName) {
+        // Скрыть все разделы
+        document.querySelectorAll('main, section').forEach(section => {
+            section.classList.add('hidden');
+        });
+
+        // Показать выбранный раздел
+        if (sectionName === 'menu') {
+            document.querySelector('main').classList.remove('hidden');
+        } else {
+            document.getElementById(sectionName + '-section').classList.remove('hidden');
+        }
+
+        // Обновить активную ссылку в навигации
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.classList.remove('active');
+        });
+        document.querySelector(`[data-section="${sectionName}"]`).classList.add('active');
+    }
+
+
+    async loadMenu() {
+    try {
+        this.showSkeleton(6); // Показываем 6 скелетонов
+        
+        const response = await fetch('/api/menu');
+        if (!response.ok) throw new Error('Ошибка загрузки меню');
+        
+        this.products = await response.json(); // Сохраняем продукты в свойство
+        this.renderMenu(this.products);
+    } catch (error) {
+        console.error('Error:', error);
+        this.menuContainer.innerHTML = `
+            <div class="error">
+                <p>😕 Не удалось загрузить меню</p>
+                <button onclick="location.reload()">Попробовать снова</button>
+            </div>
+        `;
+    }
+}
 
     setupAuthModals() {
         window.addEventListener('click', (e) => {
@@ -111,16 +144,37 @@ class MenuApp {
     }
 
     addToCart(productId) {
-        // Здесь будет логика добавления в корзину
-        console.log('Adding to cart:', productId);
-        
-        // Временная анимация
-        const btn = document.querySelector(`[data-id="${productId}"]`);
-        btn.textContent = '✅ Добавлено!';
-        setTimeout(() => {
-            btn.textContent = 'Добавить в корзину';
-        }, 2000);
+    // Анимация добавления
+    const btn = document.querySelector(`[data-id="${productId}"]`);
+    btn.textContent = '✅ Добавлено!';
+    setTimeout(() => {
+        btn.textContent = 'Добавить в корзину';
+    }, 2000);
+
+    // Находим продукт в сохраненном массиве
+    const product = this.products.find(p => p.id == productId);
+    if (!product) {
+        console.error('Product not found:', productId);
+        return;
     }
+    
+    // Проверяем, есть ли уже такой продукт в корзине
+    const existingItem = this.cart.find(item => item.id == productId);
+    
+    if (existingItem) {
+        // Увеличиваем количество
+        existingItem.quantity = (existingItem.quantity || 1) + 1;
+    } else {
+        // Добавляем новый продукт с количеством 1
+        this.cart.push({
+            ...product,
+            quantity: 1
+        });
+    }
+    
+    this.updateCartUI();
+    this.showNotification(`Добавлено: ${product.name}`);
+}
 
     setupAuthModals() {
         window.addEventListener('click', (e) => {
@@ -208,6 +262,97 @@ class MenuApp {
             // Показываем кнопки входа/регистрации
         }
     }
+
+    updateCartUI() {
+    const cartItemsContainer = document.getElementById('cart-items');
+    const totalPriceElement = document.getElementById('total-price');
+    
+    if (!cartItemsContainer || !totalPriceElement) return;
+    
+    // Очищаем контейнер
+    cartItemsContainer.innerHTML = '';
+    
+    if (this.cart.length === 0) {
+        cartItemsContainer.innerHTML = '<p class="empty-cart">Корзина пуста</p>';
+        totalPriceElement.textContent = '0';
+        return;
+    }
+    
+    // Добавляем товары с новой структурой
+    this.cart.forEach(item => {
+        const itemElement = document.createElement('div');
+        itemElement.className = 'cart-item';
+        itemElement.innerHTML = `
+            <div class="cart-item-content">
+                <div class="cart-item-details">
+                    <div class="cart-item-title">${item.name}</div>
+                    <div class="cart-item-price">${item.price} ₽ × ${item.quantity} = ${item.price * item.quantity} ₽</div>
+                    <div class="cart-item-quantity">
+                        <button class="quantity-btn" onclick="app.changeQuantity(${item.id}, -1)">-</button>
+                        <span class="quantity-number">${item.quantity}</span>
+                        <button class="quantity-btn" onclick="app.changeQuantity(${item.id}, 1)">+</button>
+                    </div>
+                </div>
+            </div>
+            <button class="remove-from-cart" onclick="app.removeItemCompletely(${item.id})">×</button>
+        `;
+        cartItemsContainer.appendChild(itemElement);
+    });
+    
+    // Обновляем общую сумму
+    const total = this.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    totalPriceElement.textContent = total;
+}
+
+// Добавляем метод для изменения количества
+changeQuantity(productId, delta) {
+    const item = this.cart.find(item => item.id == productId);
+    
+    if (item) {
+        item.quantity += delta;
+        
+        if (item.quantity <= 0) {
+            this.removeItemCompletely(productId);
+        } else {
+            this.updateCartUI();
+        }
+    }
+}
+
+// Метод для полного удаления товара
+removeItemCompletely(productId) {
+    const itemIndex = this.cart.findIndex(item => item.id == productId);
+    
+    if (itemIndex !== -1) {
+        this.cart.splice(itemIndex, 1);
+        this.updateCartUI();
+        this.showNotification('Товар удален из корзины');
+    }
+}
+
+showNotification(message) {
+    // Создаем уведомление
+    const notification = document.createElement('div');
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #8b5cf6;
+        color: white;
+        padding: 15px 20px;
+        border-radius: 8px;
+        z-index: 1001;
+        animation: slideIn 0.3s ease;
+    `;
+    notification.textContent = message;
+    
+    document.body.appendChild(notification);
+    
+    // Удаляем через 3 секунды
+    setTimeout(() => {
+        notification.remove();
+    }, 3000);
+}
 }
 
 // Запуск приложения

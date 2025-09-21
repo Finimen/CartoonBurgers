@@ -325,3 +325,216 @@ form button {
 form button:hover {
     background: #7c3aed;
 }
+
+.hidden {
+    display: none;
+}
+
+.visible {
+    display: block;
+}
+
+/* Стили для корзины */
+#cart-items {
+    margin-bottom: 30px;
+}
+
+.cart-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    border-bottom: 1px solid #333;
+}
+
+.cart-item img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.cart-total {
+    text-align: right;
+    margin: 20px 0;
+    padding: 20px;
+    background: #111;
+    border-radius: 10px;
+}
+
+/* Стили для профиля */
+#user-info {
+    background: #111;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 30px;
+}
+
+.order-card {
+    background: #111;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+select {
+    background: #222;
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 12px;
+    color: white;
+    font-size: 16px;
+    appearance: none; /* Убираем стандартный стиль браузера */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    cursor: pointer;
+    width: 100%;
+    position: relative;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238b5cf6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px;
+}
+
+select:focus {
+    outline: none;
+    border-color: #8b5cf6;
+}
+
+/* Стили для опций */
+option {
+    background: #222;
+    color: white;
+    padding: 10px;
+}
+
+/* Для браузеров на основе WebKit (Chrome, Safari) */
+select::-webkit-scrollbar {
+    width: 8px;
+}
+
+select::-webkit-scrollbar-track {
+    background: #111;
+    border-radius: 4px;
+}
+
+select::-webkit-scrollbar-thumb {
+    background: #8b5cf6;
+    border-radius: 4px;
+}
+
+select::-webkit-scrollbar-thumb:hover {
+    background: #7c3aed;
+}
+
+.cart-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    border-bottom: 1px solid #333;
+    position: relative;
+}
+
+.remove-from-cart {
+    background: #ff4757;
+    color: white;
+    border: none;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    margin-left: 15px;
+    flex-shrink: 0;
+}
+
+.remove-from-cart:hover {
+    background: #ff3742;
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(255, 71, 87, 0.3);
+}
+
+.remove-from-cart:active {
+    transform: scale(0.95);
+}
+
+/* Улучшаем отображение содержимого корзины */
+.cart-item-content {
+    display: flex;
+    align-items: center;
+    flex-grow: 1;
+}
+
+.cart-item img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-right: 15px;
+}
+
+.cart-item-details {
+    flex-grow: 1;
+}
+
+.cart-item-title {
+    font-size: 1.2em;
+    font-weight: 600;
+    margin-bottom: 5px;
+    color: #fff;
+}
+
+.cart-item-price {
+    color: #8b5cf6;
+    font-weight: 700;
+}
+
+.cart-item-quantity {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 5px;
+}
+
+.quantity-btn {
+    background: #333;
+    border: none;
+    color: white;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: bold;
+    transition: background 0.3s ease;
+}
+
+.quantity-btn:hover {
+    background: #8b5cf6;
+}
+
+.quantity-number {
+    font-weight: 600;
+    min-width: 20px;
+    text-align: center;
+}

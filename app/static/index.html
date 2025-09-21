@@ -12,9 +12,9 @@
         <header>
             <h1>BURGER <span>SPACE</span></h1>
             <nav>
-                <a href="#" class="active">Меню</a>
-                <a href="#">Корзина</a>
-                <a href="#">Профиль</a>
+                <a href="#" class="nav-link active" data-section="menu">Меню</a>
+                <a href="#" class="nav-link" data-section="cart">Корзина</a>
+                <a href="#" class="nav-link" data-section="profile">Профиль</a>
                 <div class="auth-buttons">
                     <button class="auth-btn" onclick="app.showLoginModal()">Войти</button>
                     <button class="auth-btn primary" onclick="app.showRegisterModal()">Регистрация</button>
@@ -35,6 +35,42 @@
                 <!-- Сюда будет вставляться меню через JS -->
             </div>
         </main>
+        <section id="cart-section" class="hidden">
+    <div class="container">
+        <h2>Корзина</h2>
+        <div id="cart-items">
+            <!-- Товары будут добавляться через JS -->
+        </div>
+        <div class="cart-total">
+            <h3>Итого: <span id="total-price">0</span> ₽</h3>
+        </div>
+        <form id="checkout-form">
+            <h3>Данные для доставки</h3>
+            <input type="text" placeholder="Адрес доставки" required>
+            <input type="tel" placeholder="Телефон" required>
+            <h3>Способ оплаты</h3>
+            <select>
+                <option value="cash">Наличными при получении</option>
+                <option value="card">Картой онлайн</option>
+            </select>
+            <button type="submit">Оформить заказ</button>
+        </form>
+    </div>
+</section>
+
+<section id="profile-section" class="hidden">
+    <div class="container">
+        <h2>Профиль</h2>
+        <div id="user-info">
+            <p>Email: <span id="user-email"></span></p>
+            <p>Бонусы: <span id="user-bonus">0</span></p>
+        </div>
+        <div id="order-history">
+            <h3>История заказов</h3>
+            <!-- История заказов будет здесь -->
+        </div>
+    </div>
+</section>
     </div>
 
     <script src="static/app.js"></script>
