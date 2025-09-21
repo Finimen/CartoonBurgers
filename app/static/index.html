@@ -7,7 +7,8 @@
     <link rel="stylesheet" href="static/style.css">
 </head>
 <body>
-
+    <div class="animated-background"></div>
+    <canvas id="particles-canvas"></canvas>
     <div class="container">
         <header>
             <h1>BURGER <span>SPACE</span></h1>
@@ -36,42 +37,120 @@
             </div>
         </main>
         <section id="cart-section" class="hidden">
-    <div class="container">
-        <h2>Корзина</h2>
-        <div id="cart-items">
-            <!-- Товары будут добавляться через JS -->
-        </div>
-        <div class="cart-total">
-            <h3>Итого: <span id="total-price">0</span> ₽</h3>
-        </div>
-        <form id="checkout-form">
-            <h3>Данные для доставки</h3>
-            <input type="text" placeholder="Адрес доставки" required>
-            <input type="tel" placeholder="Телефон" required>
-            <h3>Способ оплаты</h3>
-            <select>
-                <option value="cash">Наличными при получении</option>
-                <option value="card">Картой онлайн</option>
-            </select>
-            <button type="submit">Оформить заказ</button>
-        </form>
-    </div>
-</section>
+            <div class="container">
+                <h2>Корзина</h2>
+                <div id="cart-items">
+                    <!-- Товары будут добавляться через JS -->
+                </div>
+                <div class="cart-total">
+                    <h3>Итого: <span id="total-price">0</span> ₽</h3>
+                </div>
+                <form id="checkout-form">
+                    <h3>Данные для доставки</h3>
+                    
+                    <div class="map-container">
+                        <div id="map" style="height: 300px; margin-bottom: 20px; border-radius: 10px;"></div>
+                        <input type="text" id="delivery-address" placeholder="Адрес доставки" required>
+                    </div>
+                    
+                    <input type="tel" id="delivery-phone" placeholder="Телефон" required 
+                        pattern="^\+7\s?[\(]?\d{3}[\)]?\s?\d{3}[-]?\d{2}[-]?\d{2}$" 
+                        title="Формат: +7 (999) 999-99-99">
+                    
+                    <h3>Способ оплаты</h3>
+                    <select id="payment-method">
+                        <option value="cash">Наличными при получении</option>
+                        <option value="card">Картой онлайн</option>
+                    </select>
 
-<section id="profile-section" class="hidden">
-    <div class="container">
-        <h2>Профиль</h2>
-        <div id="user-info">
-            <p>Email: <span id="user-email"></span></p>
-            <p>Бонусы: <span id="user-bonus">0</span></p>
+                    <!-- Поля для карты (скрыты по умолчанию) -->
+                    <div id="card-fields" class="hidden">
+                        <h4>Данные карты</h4>
+                        <input type="text" id="card-number" placeholder="Номер карты" 
+                            pattern="\d{16}" title="16 цифр без пробелов">
+                        <div class="card-row">
+                            <input type="text" id="card-expiry" placeholder="ММ/ГГ" 
+                                pattern="\d{2}/\d{2}" title="Формат: ММ/ГГ">
+                            <input type="text" id="card-cvv" placeholder="CVV" 
+                                pattern="\d{3}" title="3 цифры">
+                        </div>
+                    </div>
+
+                    <button type="submit">Оформить заказ</button>
+                </form>
+            </div>
+        </section>
+
+    <!-- Поля для карты (скрыты по умолчанию) -->
+                <div id="card-fields" class="hidden">
+                    <h4>Данные карты</h4>
+                    <input type="text" id="card-number" placeholder="Номер карты" 
+                        pattern="\d{16}" title="16 цифр без пробелов">
+                    <div class="card-row">
+                        <input type="text" id="card-expiry" placeholder="ММ/ГГ" 
+                            pattern="\d{2}/\d{2}" title="Формат: ММ/ГГ">
+                        <input type="text" id="card-cvv" placeholder="CVV" 
+                            pattern="\d{3}" title="3 цифры">
+                    </div>
+                </div>
+
+
+                    <button type="submit">Оформить заказ</button>
+                </form>
+            </div>
+        </section>
+
+        <section id="profile-section" class="hidden">
+        <div class="container">
+            <h2 class="profile-title">Профиль</h2>
+            <div id="auth-required-message" class="hidden">
+                <p>Для просмотра профиля необходимо авторизоваться</p>
+                <button class="auth-btn primary" onclick="app.showLoginModal()">Войти</button>
+            </div>
+            <div id="user-info" class="hidden">
+                <div class="profile-card">
+                    <div class="profile-header">
+                        <h3 class="username" id="user-username">Test5</h3>
+                    </div>
+                    
+                    <div class="profile-details">
+                        <div class="detail-item">
+                            <span class="detail-icon">📧</span>
+                            <div class="detail-content">
+                                <span class="detail-label">Email:</span>
+                                <span class="detail-value" id="user-email">Test1t@gmail.com</span>
+                            </div>
+                        </div>
+                        
+                        <div class="detail-item">
+                            <span class="detail-icon">⭐</span>
+                            <div class="detail-content">
+                                <span class="detail-label">Бонусы:</span>
+                                <span class="detail-value bonus-count" id="user-bonus">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="order-history-section">
+                <h3 class="history-title">История заказов</h3>
+                <div id="order-history" class="order-cards">
+                    <!-- Будут добавляться заказы -->
+                    <div class="empty-orders">
+                        <span class="empty-icon">📦</span>
+                        <p>У вас пока нет заказов</p>
+                        <button class="cta-button" onclick="app.showSection('menu')">Сделать первый заказ</button>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div id="order-history">
-            <h3>История заказов</h3>
-            <!-- История заказов будет здесь -->
+    </section>
+    
         </div>
-    </div>
-</section>
-    </div>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <script src="static/app.js"></script>
     <div id="loginModal" class="modal">
@@ -99,5 +178,33 @@
         </form>
     </div>
 </div>
+<footer>
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>BURGER SPACE</h3>
+                <p>Доставка вкуснейших бургеров в вашей галактике</p>
+            </div>
+            <div class="footer-section">
+                <h4>Контакты</h4>
+                <p>Телефон: +7 (918) 567-05-02</p>
+                <p>Email: finimensniper@gmail.com</p>
+            </div>
+            <div class="footer-section">
+                <h4>Адрес</h4>
+                <p>ул. Бургерная, 1, Москва</p>
+            </div>
+            <div class="footer-section">
+                <h4>Часы работы</h4>
+                <p>Круглосуточно, 24/7</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 BURGER SPACE. Все права защищены.</p>
+            <a href="#">Пользовательское соглашение</a>
+            <a href="#">Политика конфиденциальности</a>
+        </div>
+    </div>
+</footer>
 </body>
 </html>

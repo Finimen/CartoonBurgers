@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -91,6 +92,7 @@ func (h *RegisterHandler) RegisterHandlerGin(c *gin.Context) {
 func AuthMiddleware(jwtKey string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		tokenStr := c.GetHeader("Authorization")
+		fmt.Printf("Token from header: %s\n", tokenStr) // Debug
 
 		if tokenStr == "" {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Missing token"})
@@ -98,18 +100,38 @@ func AuthMiddleware(jwtKey string) gin.HandlerFunc {
 			return
 		}
 
+		// Убираем "Bearer " префикс если есть
+		tokenStr = strings.TrimPrefix(tokenStr, "Bearer ")
+
 		token, err := jwt.Parse(tokenStr, func(t *jwt.Token) (interface{}, error) {
 			if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
 				return nil, errors.New("unexpected signed method")
 			}
-
 			return []byte(jwtKey), nil
 		})
 
-		if err != nil || !token.Valid {
+		if err != nil {
+			fmt.Printf("Token parse error: %v\n", err) // Debug
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token: " + err.Error()})
+			c.Abort()
+			return
+		}
+
+		if !token.Valid {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
 			c.Abort()
 			return
+		}
+
+		// Добавляем claims в контекст для дальнейшего использования
+		if claims, ok := token.Claims.(jwt.MapClaims); ok {
+			if username, exists := claims["username"]; exists {
+				c.Set("username", username)
+			} else {
+				c.JSON(http.StatusUnauthorized, gin.H{"error": "Username not found in token"})
+				c.Abort()
+				return
+			}
 		}
 
 		c.Next()

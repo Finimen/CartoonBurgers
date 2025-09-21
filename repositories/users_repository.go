@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 type UserRepository struct {
@@ -23,6 +24,24 @@ func NewUserRepository(ctx context.Context) (*UserRepository, error) {
 	}
 
 	return repo, nil
+}
+
+func (r *UserRepository) GetUserProfile(ctx context.Context, username string) (*models.User, error) {
+	var user models.User
+
+	username = strings.Replace(username, " ", "", -1)
+	query := `SELECT username, email, bonus FROM users WHERE username = $1`
+	err := r.db.QueryRowContext(ctx, query, username).Scan(
+		&user.Username,
+		&user.Email,
+		&user.Bonus,
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &user, nil
 }
 
 func (repo *UserRepository) GetUserByUserame(ctx context.Context, name string) (string, error) {
