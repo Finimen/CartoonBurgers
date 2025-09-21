@@ -177,3 +177,26 @@ nav a.active {
     0% { background-position: 200% 0; }
     100% { background-position: -200% 0; }
 }
+
+.product-image {
+    width: 100%;
+    height: 200px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    margin-bottom: 15px;
+    border-radius: 10px;
+}
+
+.product-image:not([style*="background-image"]) {
+    background: #222;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #666;
+    font-size: 14px;
+}
+
+.product-image:not([style*="background-image"])::after {
+    content: "Нет изображения";
+}

@@ -40,13 +40,14 @@ class MenuApp {
     renderMenu(products) {
         this.menuContainer.innerHTML = products.map(product => `
             <div class="product-card" data-category="${product.category}">
-                <h3>${product.name}</h3>
-                <div class="price">${product.price} ₽</div>
-                <div class="description">В наличии: ${product.count} шт.</div>
-                <button class="add-btn" data-id="${product.id}">
-                    Добавить в корзину
-                </button>
-            </div>
+            <div class="product-image" style="background-image: url('/static/images/${product.id}.png')"></div>
+            <h3>${product.name}</h3>
+            <div class="price">${product.price} ₽</div>
+            <div class="description">Колличество: ${product.count} шт.</div>
+            <button class="add-btn" data-id="${product.id}">
+                Добавить в корзину
+            </button>
+        </div>
         `).join('');
 
         this.setupAddButtons();

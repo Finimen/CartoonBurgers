@@ -2,6 +2,7 @@ package main
 
 import (
 	"CartoonBurgers/handlers"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
@@ -12,11 +13,14 @@ func main() {
 	r.Static("/static", "./static")
 	r.LoadHTMLGlob("static/*.html")
 
-	r.GET("/api/menu")
-
 	api := r.Group("/api")
 	{
-		api.GET("/menu", handlers.GetMenuHandler())
-		api.GET("")
+		api.GET("/menu", handlers.GetMenuHandler)
 	}
+
+	r.NoRoute(func(ctx *gin.Context) {
+		ctx.HTML(http.StatusOK, "index.html", nil)
+	})
+
+	r.Run(":8080")
 }

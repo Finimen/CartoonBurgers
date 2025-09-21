@@ -4,6 +4,7 @@ import (
 	"CartoonBurgers/models"
 	"context"
 	"database/sql"
+	"fmt"
 	"os"
 	"path/filepath"
 
@@ -14,22 +15,86 @@ type MenuPerository struct {
 	db *sql.DB
 }
 
+func NewMenuRepository(ctx context.Context) (*MenuPerository, error) {
+	repo := &MenuPerository{}
+	err := repo.Init(ctx)
+	if err != nil {
+		fmt.Print("INIT ERROR")
+		fmt.Print("INIT ERROR")
+		fmt.Print("INIT ERROR")
+	}
+	return repo, err
+}
+
 func (prod *MenuPerository) Init(ctx context.Context) error {
-	var db, err = sql.Open("sqlite", "./products")
+	var db, err = sql.Open("sqlite", "./products.db")
 	if err != nil {
 		return err
 	}
 
-	var path = filepath.Join("migrations", "001_create_products_table_up.sql")
+	if err := db.Ping(); err != nil {
+		return err
+	}
+
+	var path = filepath.Join("..", "repositories", "migrations", "001_create_products_table_up.sql")
 	var req []byte
 	req, err = os.ReadFile(path)
 	if err != nil {
+		fmt.Print("CANNOT TO READ FILE MATHA FACKA")
 		return err
 	}
 
 	_, err = db.ExecContext(ctx, string(req))
 
 	prod.db = db
+
+	if err != nil {
+		return err
+	}
+
+	return prod.fillDB(ctx)
+}
+
+func (prod *MenuPerository) fillDB(ctx context.Context) error {
+	var count int
+	var err = prod.db.QueryRowContext(ctx, "SELECT COUNT(*) FROM products").Scan(&count)
+
+	if err != nil {
+		return err
+	}
+
+	if count == 0 {
+		tx, err := prod.db.BeginTx(ctx, nil)
+		if err != nil {
+			return err
+		}
+		defer tx.Rollback()
+
+		products := []models.Product{
+			{Name: "Cheese Burger", Price: 160, Count: 1, Type: 0, Category: 0},
+			{Name: "Classic Carton", Price: 200, Count: 1, Type: 0, Category: 0},
+			{Name: "Twicer Classic", Price: 270, Count: 1, Type: 0, Category: 0},
+			{Name: "Twicer Double", Price: 330, Count: 1, Type: 0, Category: 0},
+			{Name: "Purple Burger", Price: 390, Count: 1, Type: 1, Category: 0},
+			{Name: "Chiken Nuggets", Price: 129, Count: 12, Type: 0, Category: 1},
+			{Name: "Efilio Cake", Price: 199, Count: 1, Type: 0, Category: 3},
+			{Name: "Purple Cake", Price: 199, Count: 1, Type: 1, Category: 3},
+		}
+		for _, p := range products {
+			_, err = tx.ExecContext(ctx, `INSERT INTO products (pName, pPrice, pCount, pType, pCategory) VALUES (?, ?, ?, ?, ?)`,
+				p.Name, p.Price, p.Count, p.Type, p.Category)
+
+			if err != nil {
+				return err
+			}
+		}
+
+		if err := tx.Commit(); err != nil {
+			return err
+		}
+	}
+
+	fmt.Print("SUCCESSFULL FILLED")
 
 	return err
 }
@@ -42,6 +107,8 @@ func (prod *MenuPerository) GetAll(ctx context.Context) ([]models.Product, error
 	}
 	defer rows.Close()
 
+	fmt.Println("GETTING FROM DB")
+
 	var products []models.Product
 	for rows.Next() {
 		var p models.Product
@@ -51,6 +118,8 @@ func (prod *MenuPerository) GetAll(ctx context.Context) ([]models.Product, error
 		}
 		products = append(products, p)
 	}
+
+	fmt.Println("ALL OBJETCS COUNT: ", len(products))
 
 	return products, rows.Err()
 }
