@@ -25,6 +25,16 @@ type LoginHandler struct {
 type BcryptHasher struct {
 }
 
+func NewRegisterHandler(hasher IPasswordHasher, repo repositories.UserRepository) RegisterHandler {
+	var register = RegisterHandler{Hasher: hasher, Repository: repo}
+	return register
+}
+
+func NewLoginHandler(hasher IPasswordHasher, repo repositories.UserRepository, jwtKey []byte) LoginHandler {
+	var login = LoginHandler{Hasher: hasher, Repository: repo, JwtKey: jwtKey}
+	return login
+}
+
 func (b *BcryptHasher) GenerateFromPassword(password []byte, cost int) ([]byte, error) {
 	return bcrypt.GenerateFromPassword(password, cost)
 }

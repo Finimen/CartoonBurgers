@@ -13,12 +13,19 @@ func main() {
 	r.Static("/static", "./static")
 	r.LoadHTMLGlob("static/*.html")
 
+	var auth = handlers.NewAuthHandlers("test_key")
+
 	api := r.Group("/api")
 	{
 		api.GET("/menu", handlers.GetMenuHandler)
-		api.POST("/register", handlers.GetLoginHandler)
-		api.POST("/login", handlers.GetLoginHandler)
-		api.GET("/profile", handlers.GetMiddlewareHadnler)
+
+		authGroup := api.Group("/auth")
+		{
+			authGroup.POST("/register", auth.GetRegisterHandler)
+			authGroup.POST("/login", auth.GetLoginHandler)
+		}
+
+		//api.GET("/profile", auth.GetRegisterHandler)
 	}
 
 	r.NoRoute(func(ctx *gin.Context) {

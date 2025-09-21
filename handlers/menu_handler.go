@@ -15,13 +15,16 @@ func GetMenuHandler(ctx *gin.Context) {
 
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		fmt.Print("MENU ERROR MENU ERROR")
+		return
 	}
 
-	menuService := services.NewMenuService(*menuRepository)
+	menuService := services.NewMenuService(menuRepository)
 
 	products, err := menuService.GetMenu(ctx)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
 	}
 
 	ctx.JSON(http.StatusOK, products)

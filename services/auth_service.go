@@ -3,6 +3,7 @@ package services
 import (
 	"CartoonBurgers/models"
 	"errors"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -18,10 +19,14 @@ func (l *LoginHandler) LoginHandlerGin(c *gin.Context) {
 		return
 	}
 
+	fmt.Print("CODECODECODE 1")
+
 	if user.Username == "" || user.Password == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
 		return
 	}
+
+	fmt.Print("CODECODECODE 2")
 
 	storedPassword, err := l.Repository.GetUserByUserame(c.Request.Context(), user.Username)
 	if err != nil {
@@ -29,11 +34,15 @@ func (l *LoginHandler) LoginHandlerGin(c *gin.Context) {
 		return
 	}
 
+	fmt.Print("CODECODECODE 3")
+
 	err = l.Hasher.CompareHashAndPassword([]byte(storedPassword), []byte(user.Password))
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credits"})
 		return
 	}
+
+	fmt.Print("CODECODECODE 4")
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"username": user.Username,
@@ -46,17 +55,20 @@ func (l *LoginHandler) LoginHandlerGin(c *gin.Context) {
 		return
 	}
 
+	fmt.Print("WORKEDWORKEDWORKEDWORKEDWORKEDWORKEDWORKEDWORKEDWORKED")
 	c.JSON(http.StatusOK, gin.H{"token": tokenString})
 }
 
 func (h *RegisterHandler) RegisterHandlerGin(c *gin.Context) {
 	var user models.User
 	if err := c.ShouldBindJSON(&user); err != nil {
+		fmt.Print("EMPTYEMPTY")
 		c.JSON(http.StatusBadRequest, gin.H{"error: ": "Invalid input"})
 		return
 	}
 
 	if user.Username == "" || user.Password == "" || user.Email == "" {
+		fmt.Print("EMPTYEMPTY")
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
 		return
 	}
@@ -76,7 +88,7 @@ func (h *RegisterHandler) RegisterHandlerGin(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"massage": "User registered successfully"})
 }
 
-func authMiddleware(jwtKey string) gin.HandlerFunc {
+func AuthMiddleware(jwtKey string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		tokenStr := c.GetHeader("Authorization")
 

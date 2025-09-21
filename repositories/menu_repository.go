@@ -11,12 +11,12 @@ import (
 	_ "modernc.org/sqlite"
 )
 
-type MenuPerository struct {
+type MenuRerository struct {
 	db *sql.DB
 }
 
-func NewMenuRepository(ctx context.Context) (*MenuPerository, error) {
-	repo := &MenuPerository{}
+func NewMenuRepository(ctx context.Context) (*MenuRerository, error) {
+	repo := &MenuRerository{}
 	err := repo.Init(ctx)
 	if err != nil {
 		fmt.Print("INIT ERROR")
@@ -25,7 +25,7 @@ func NewMenuRepository(ctx context.Context) (*MenuPerository, error) {
 	return repo, nil
 }
 
-func (prod *MenuPerository) Init(ctx context.Context) error {
+func (prod *MenuRerository) Init(ctx context.Context) error {
 	var db, err = sql.Open("sqlite", "./products.db")
 	if err != nil {
 		return err
@@ -39,7 +39,6 @@ func (prod *MenuPerository) Init(ctx context.Context) error {
 	var req []byte
 	req, err = os.ReadFile(path)
 	if err != nil {
-		fmt.Print("CANNOT TO READ FILE MATHA FACKA")
 		return err
 	}
 
@@ -54,7 +53,7 @@ func (prod *MenuPerository) Init(ctx context.Context) error {
 	return prod.fillDB(ctx)
 }
 
-func (prod *MenuPerository) fillDB(ctx context.Context) error {
+func (prod *MenuRerository) fillDB(ctx context.Context) error {
 	var count int
 	var err = prod.db.QueryRowContext(ctx, "SELECT COUNT(*) FROM products").Scan(&count)
 
@@ -93,20 +92,16 @@ func (prod *MenuPerository) fillDB(ctx context.Context) error {
 		}
 	}
 
-	fmt.Print("SUCCESSFULL FILLED")
-
 	return err
 }
 
-func (prod *MenuPerository) GetAll(ctx context.Context) ([]models.Product, error) {
+func (prod *MenuRerository) GetAll(ctx context.Context) ([]models.Product, error) {
 	rows, err := prod.db.QueryContext(ctx, "SELECT id, pName, pPrice, pCount, pType, pCategory FROM products")
 
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-
-	fmt.Println("GETTING FROM DB")
 
 	var products []models.Product
 	for rows.Next() {
@@ -117,8 +112,6 @@ func (prod *MenuPerository) GetAll(ctx context.Context) ([]models.Product, error
 		}
 		products = append(products, p)
 	}
-
-	fmt.Println("ALL OBJETCS COUNT: ", len(products))
 
 	return products, rows.Err()
 }

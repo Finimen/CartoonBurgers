@@ -7,11 +7,11 @@ import (
 )
 
 type MenuService struct {
-	repo *repositories.MenuPerository
+	repo *repositories.MenuRerository
 }
 
-func NewMenuService(repo repositories.MenuPerository) *MenuService {
-	return &MenuService{repo: &repo}
+func NewMenuService(repo *repositories.MenuRerository) *MenuService {
+	return &MenuService{repo: repo}
 }
 
 func (s *MenuService) GetMenu(ctx context.Context) ([]models.Product, error) {

@@ -27,13 +27,13 @@ func NewUserRepository(ctx context.Context) (*UserRepository, error) {
 
 func (repo *UserRepository) GetUserByUserame(ctx context.Context, name string) (string, error) {
 	var password string
-	var row = repo.db.QueryRowContext(ctx, "SELECT password WHERE username = ? FROM users", name)
+	var row = repo.db.QueryRowContext(ctx, "SELECT passwordHash FROM users WHERE username = ?", name)
 	err := row.Scan(&password)
 	return password, err
 }
 
 func (repo *UserRepository) CreateUser(ctx context.Context, user models.User, hashedPassword string) error {
-	_, err := repo.db.ExecContext(ctx, "INSERT INTO users (username, password, email) VALUES (?, ?, ?)", user.Username, user.Password, user.Email)
+	_, err := repo.db.ExecContext(ctx, "INSERT INTO users (username, passwordHash, email) VALUES (?, ?, ?)", user.Username, hashedPassword, user.Email)
 	return err
 }
 
@@ -44,6 +44,7 @@ func (repo *UserRepository) init(ctx context.Context) error {
 	}
 
 	if err := db.Ping(); err != nil {
+		fmt.Print("PING ERROR")
 		return err
 	}
 
@@ -57,6 +58,7 @@ func (repo *UserRepository) init(ctx context.Context) error {
 	repo.db = db
 	_, err = db.ExecContext(ctx, string(com))
 	if err != nil {
+		fmt.Print("EXEC ERROR", path)
 		return err
 	}
 
