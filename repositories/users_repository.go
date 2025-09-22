@@ -49,7 +49,7 @@ func (r *UserRepository) GetUserProfile(ctx context.Context, username string) (*
 	return &user, nil
 }
 
-func (repo *UserRepository) GetUserByUserame(ctx context.Context, name string) (string, error) {
+func (repo *UserRepository) GetUserByUsername(ctx context.Context, name string) (string, error) {
 	var password string
 	var row = repo.db.QueryRowContext(ctx, "SELECT passwordHash FROM users WHERE username = ?", name)
 	err := row.Scan(&password)

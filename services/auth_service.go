@@ -16,9 +16,14 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+type IRedisClient interface {
+	Get(key string) *redis.StringCmd
+	Exists(key string) *redis.IntCmd
+}
+
 // @Summary User login implementation
 // @Description Internal login handler service
-func (l *LoginHandler) LoginHandlerGin(c *gin.Context) {
+func (l *LoginHandler) Login(c *gin.Context) {
 	var user models.User
 	if err := c.ShouldBindJSON(&user); err != nil {
 		l.Logger.Warn("invalid input format in login",
@@ -39,7 +44,7 @@ func (l *LoginHandler) LoginHandlerGin(c *gin.Context) {
 		"username", user.Username,
 		"client_ip", c.ClientIP())
 
-	storedPassword, err := l.Repository.GetUserByUserame(c.Request.Context(), user.Username)
+	storedPassword, err := l.Repository.GetUserByUsername(c.Request.Context(), user.Username)
 	if err != nil {
 		l.Logger.Warn("user not found or database error",
 			"username", user.Username,
@@ -80,7 +85,7 @@ func (l *LoginHandler) LoginHandlerGin(c *gin.Context) {
 
 // @Summary User registration implementation
 // @Description Internal registration handler service
-func (h *RegisterHandler) RegisterHandlerGin(c *gin.Context) {
+func (h *RegisterHandler) Register(c *gin.Context) {
 	var user models.User
 	if err := c.ShouldBindJSON(&user); err != nil {
 		h.Logger.Warn("invalid input format in registration",
@@ -150,7 +155,7 @@ func AuthMiddleware(jwtKey string, logger *slog.Logger) gin.HandlerFunc {
 			return
 		}
 
-		redisClient := c.MustGet("redis").(*redis.Client)
+		redisClient := c.MustGet("redis").(IRedisClient)
 		hash := sha256.Sum256([]byte(tokenStr))
 		tokenHash := hex.EncodeToString(hash[:])
 		exists, err := redisClient.Exists("blacklist:" + tokenHash).Result()

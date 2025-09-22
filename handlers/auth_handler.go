@@ -42,8 +42,8 @@ func NewAuthHandlers(jwtKey string, userRepo *repositories.UserRepository, logge
 // @Failure 500 {object} map[string]string "Internal server error"
 // @Router /register [post]
 func (a *AuthHandlers) GetRegisterHandler(c *gin.Context) {
-	registerHandler := services.NewRegisterHandler(a.Hasher, *a.userRepo, a.logger)
-	registerHandler.RegisterHandlerGin(c)
+	registerHandler := services.NewRegisterHandler(a.Hasher, a.userRepo, a.logger)
+	registerHandler.Register(c)
 }
 
 // @Summary User login
@@ -58,8 +58,8 @@ func (a *AuthHandlers) GetRegisterHandler(c *gin.Context) {
 // @Failure 500 {object} map[string]string "Internal server error"
 // @Router /login [post]
 func (a *AuthHandlers) GetLoginHandler(c *gin.Context) {
-	loginHandler := services.NewLoginHandler(a.Hasher, *a.userRepo, a.JwtKey, a.logger)
-	loginHandler.LoginHandlerGin(c)
+	loginHandler := services.NewLoginHandler(a.Hasher, a.userRepo, a.JwtKey, a.logger)
+	loginHandler.Login(c)
 }
 
 // @Summary User logout

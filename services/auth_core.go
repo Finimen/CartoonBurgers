@@ -1,7 +1,9 @@
 package services
 
 import (
+	"CartoonBurgers/models"
 	"CartoonBurgers/repositories"
+	"context"
 	"log/slog"
 
 	"golang.org/x/crypto/bcrypt"
@@ -12,15 +14,20 @@ type IPasswordHasher interface {
 	CompareHashAndPassword([]byte, []byte) error
 }
 
+type IRepository interface {
+	GetUserByUsername(context.Context, string) (string, error)
+	CreateUser(context.Context, models.User, string) error
+}
+
 type RegisterHandler struct {
 	Hasher     IPasswordHasher
-	Repository repositories.UserRepository
+	Repository IRepository
 	Logger     *slog.Logger
 }
 
 type LoginHandler struct {
 	Hasher     IPasswordHasher
-	Repository repositories.UserRepository
+	Repository IRepository
 	JwtKey     []byte
 	Logger     *slog.Logger
 }
@@ -28,12 +35,12 @@ type LoginHandler struct {
 type BcryptHasher struct {
 }
 
-func NewRegisterHandler(hasher IPasswordHasher, repo repositories.UserRepository, loger *slog.Logger) RegisterHandler {
+func NewRegisterHandler(hasher IPasswordHasher, repo *repositories.UserRepository, loger *slog.Logger) RegisterHandler {
 	var register = RegisterHandler{Hasher: hasher, Repository: repo, Logger: loger}
 	return register
 }
 
-func NewLoginHandler(hasher IPasswordHasher, repo repositories.UserRepository, jwtKey []byte, loger *slog.Logger) LoginHandler {
+func NewLoginHandler(hasher IPasswordHasher, repo *repositories.UserRepository, jwtKey []byte, loger *slog.Logger) LoginHandler {
 	var login = LoginHandler{Hasher: hasher, Repository: repo, JwtKey: jwtKey, Logger: loger}
 	return login
 }

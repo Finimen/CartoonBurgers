@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"CartoonBurgers/models"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -9,11 +10,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis"
 )
-
-type CartItem struct {
-	ProductID int `json:"productId"`
-	Quantity  int `json:"quantity"`
-}
 
 type CartHandler struct {
 	cookieSequre bool
@@ -52,14 +48,14 @@ func (h *CartHandler) GetCartHandler(c *gin.Context) {
 	cartData, err := redisClient.Get(cartKey).Result()
 
 	if err == redis.Nil {
-		c.JSON(200, gin.H{"items": []CartItem{}})
+		c.JSON(200, gin.H{"items": []models.CartItem{}})
 		return
 	} else if err != nil {
 		c.JSON(500, gin.H{"error": "Getting cart error"})
 		return
 	}
 
-	var cart []CartItem
+	var cart []models.CartItem
 	json.Unmarshal([]byte(cartData), &cart)
 	c.JSON(200, gin.H{"items": cart})
 }
@@ -76,7 +72,7 @@ func (h *CartHandler) GetCartHandler(c *gin.Context) {
 // @Router /add [post]
 func (h *CartHandler) AddToCartHandler(c *gin.Context) {
 	redisClient := c.MustGet("redis").(*redis.Client)
-	var item CartItem
+	var item models.CartItem
 
 	if err := c.BindJSON(&item); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid format"})
@@ -86,7 +82,7 @@ func (h *CartHandler) AddToCartHandler(c *gin.Context) {
 	cartKey := h.getCartKey(c)
 
 	cartData, err := redisClient.Get(cartKey).Result()
-	var cart []CartItem
+	var cart []models.CartItem
 
 	if err != nil && err != redis.Nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Cart error"})
@@ -132,7 +128,7 @@ func (h *CartHandler) AddToCartHandler(c *gin.Context) {
 // @Router /:productId [delete]
 func (h *CartHandler) RemoveFromCartHandler(c *gin.Context) {
 	redisClient := c.MustGet("redis").(*redis.Client)
-	var item CartItem
+	var item models.CartItem
 
 	if err := c.BindJSON(&item); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid format"})
@@ -142,7 +138,7 @@ func (h *CartHandler) RemoveFromCartHandler(c *gin.Context) {
 	cartKey := h.getCartKey(c)
 
 	cartData, err := redisClient.Get(cartKey).Result()
-	var cart []CartItem
+	var cart []models.CartItem
 
 	if err != nil && err != redis.Nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Cart error"})

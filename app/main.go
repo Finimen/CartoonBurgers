@@ -77,15 +77,17 @@ func main() {
 
 	r := gin.Default()
 
+	rAdapter := NewRedisAdapter(rdb)
+
 	r.Use(func(c *gin.Context) {
-		c.Set("redis", rdb)
+		c.Set("redis", rAdapter)
 		c.Next()
 	})
 
 	r.Static("/static", "./static")
 	r.LoadHTMLGlob("static/*.html")
 
-	menuHandler := handlers.NewMenuHandler(appRepo.MenuRerository)
+	menuHandler := handlers.NewMenuHandler(appRepo.ProductRerository)
 	authHandler := handlers.NewAuthHandlers(cfg.JWT.SecretKey, appRepo.UserRepository, logger)
 	profileHandler := handlers.NewProfileHandler(appRepo.UserRepository)
 	cartHandler := handlers.NewCartHandler(cfg.Server.CookieSecure)

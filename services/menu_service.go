@@ -7,10 +7,10 @@ import (
 )
 
 type MenuService struct {
-	repo *repositories.MenuRerository
+	repo *repositories.ProductRerository
 }
 
-func NewMenuService(repo *repositories.MenuRerository) *MenuService {
+func NewMenuService(repo *repositories.ProductRerository) *MenuService {
 	return &MenuService{repo: repo}
 }
 

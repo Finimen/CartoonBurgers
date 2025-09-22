@@ -8,10 +8,10 @@ import (
 )
 
 type MenuHandler struct {
-	menuRepo *repositories.MenuRerository
+	menuRepo *repositories.ProductRerository
 }
 
-func NewMenuHandler(repo *repositories.MenuRerository) *MenuHandler {
+func NewMenuHandler(repo *repositories.ProductRerository) *MenuHandler {
 	return &MenuHandler{menuRepo: repo}
 }
 

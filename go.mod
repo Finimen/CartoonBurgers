@@ -11,6 +11,7 @@ require (
 	github.com/bytedance/sonic/loader v0.3.0 // indirect
 	github.com/cloudwego/base64x v0.1.6 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.7 // indirect
+	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/fsnotify/fsnotify v1.9.0 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.10 // indirect
@@ -50,6 +51,7 @@ require (
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/ncruces/go-strftime v0.1.9 // indirect
 	github.com/pelletier/go-toml/v2 v2.2.4 // indirect
+	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/quic-go/qpack v0.5.1 // indirect
 	github.com/quic-go/quic-go v0.54.0 // indirect
 	github.com/redis/go-redis v6.15.9+incompatible // indirect
@@ -62,6 +64,8 @@ require (
 	github.com/spf13/cast v1.10.0 // indirect
 	github.com/spf13/pflag v1.0.10 // indirect
 	github.com/spf13/viper v1.21.0 // indirect
+	github.com/stretchr/objx v0.5.2 // indirect
+	github.com/stretchr/testify v1.11.1 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
 	github.com/swaggo/files v1.0.1 // indirect
 	github.com/swaggo/gin-swagger v1.6.1 // indirect

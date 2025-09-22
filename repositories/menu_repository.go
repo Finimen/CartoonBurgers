@@ -10,11 +10,11 @@ import (
 	_ "modernc.org/sqlite"
 )
 
-type MenuRerository struct {
+type ProductRerository struct {
 	db *sql.DB
 }
 
-func (prod *MenuRerository) Init(ctx context.Context, db *sql.DB) error {
+func (prod *ProductRerository) Init(ctx context.Context, db *sql.DB) error {
 	var path = filepath.Join("..", "repositories", "migrations", "001_create_products_table_up.sql")
 	var req, err = os.ReadFile(path)
 	if err != nil {
@@ -32,7 +32,7 @@ func (prod *MenuRerository) Init(ctx context.Context, db *sql.DB) error {
 	return prod.fillDB(ctx)
 }
 
-func (prod *MenuRerository) fillDB(ctx context.Context) error {
+func (prod *ProductRerository) fillDB(ctx context.Context) error {
 	var count int
 	var err = prod.db.QueryRowContext(ctx, "SELECT COUNT(*) FROM products").Scan(&count)
 
@@ -74,7 +74,7 @@ func (prod *MenuRerository) fillDB(ctx context.Context) error {
 	return err
 }
 
-func (prod *MenuRerository) GetAll(ctx context.Context) ([]models.Product, error) {
+func (prod *ProductRerository) GetAll(ctx context.Context) ([]models.Product, error) {
 	rows, err := prod.db.QueryContext(ctx, "SELECT id, pName, pPrice, pCount, pType, pCategory FROM products")
 
 	if err != nil {
