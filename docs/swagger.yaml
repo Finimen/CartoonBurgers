@@ -1,0 +1,23 @@
+basePath: /api/v1
+host: localhost:8080
+info:
+  contact: {}
+  description: This is a sample user management API
+  title: User API
+  version: "1.0"
+paths:
+  /menu:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get restaurant menu
+      tags:
+      - menu
+swagger: "2.0"

@@ -15,6 +15,11 @@ func NewMenuHandler(repo *repositories.MenuRerository) *MenuHandler {
 	return &MenuHandler{menuRepo: repo}
 }
 
+// @Summary Get restaurant menu
+// @Tags menu
+// @Produce json
+// @Success 200 {object} []models.Products
+// @Router /menu [get]
 func (h *MenuHandler) GetMenu(ctx *gin.Context) {
 	products, err := h.menuRepo.GetAll(ctx)
 	if err != nil {

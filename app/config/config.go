@@ -8,11 +8,16 @@ import (
 )
 
 type Config struct {
-	Server    ServerConfig
-	Database  DatabaseConfig
-	Redis     RedisConfig
-	JWT       JWTConfig
-	RateLimit RateLimitConfig
+	Environment EnvironmentConfig
+	Server      ServerConfig
+	Database    DatabaseConfig
+	Redis       RedisConfig
+	JWT         JWTConfig
+	RateLimit   RateLimitConfig
+}
+
+type EnvironmentConfig struct {
+	Current string
 }
 
 type ServerConfig struct {
@@ -52,6 +57,7 @@ func LoadConfig() (config Config, err error) {
 
 	viper.AutomaticEnv()
 
+	viper.SetDefault("environment.current", "development")
 	viper.SetDefault("server.port", "8080")
 	viper.SetDefault("database.path", "./burgers.db")
 	viper.SetDefault("redis.addr", "localhost:6379")

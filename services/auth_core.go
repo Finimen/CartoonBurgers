@@ -2,6 +2,7 @@ package services
 
 import (
 	"CartoonBurgers/repositories"
+	"log/slog"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -14,24 +15,26 @@ type IPasswordHasher interface {
 type RegisterHandler struct {
 	Hasher     IPasswordHasher
 	Repository repositories.UserRepository
+	Logger     *slog.Logger
 }
 
 type LoginHandler struct {
 	Hasher     IPasswordHasher
 	Repository repositories.UserRepository
 	JwtKey     []byte
+	Logger     *slog.Logger
 }
 
 type BcryptHasher struct {
 }
 
-func NewRegisterHandler(hasher IPasswordHasher, repo repositories.UserRepository) RegisterHandler {
-	var register = RegisterHandler{Hasher: hasher, Repository: repo}
+func NewRegisterHandler(hasher IPasswordHasher, repo repositories.UserRepository, loger *slog.Logger) RegisterHandler {
+	var register = RegisterHandler{Hasher: hasher, Repository: repo, Logger: loger}
 	return register
 }
 
-func NewLoginHandler(hasher IPasswordHasher, repo repositories.UserRepository, jwtKey []byte) LoginHandler {
-	var login = LoginHandler{Hasher: hasher, Repository: repo, JwtKey: jwtKey}
+func NewLoginHandler(hasher IPasswordHasher, repo repositories.UserRepository, jwtKey []byte, loger *slog.Logger) LoginHandler {
+	var login = LoginHandler{Hasher: hasher, Repository: repo, JwtKey: jwtKey, Logger: loger}
 	return login
 }
 

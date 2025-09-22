@@ -15,6 +15,13 @@ func NewProfileHandler(repo *repositories.UserRepository) *ProfileHandler {
 	return &ProfileHandler{userRepo: repo}
 }
 
+// @Summary Get profile info from user
+// @Tags profile
+// @Produce json
+// @Success 200 {object} models.User
+// @Failure 401 {object} gin.H "User not authenticated"
+// @Failure 500 {object} gin.H "Failed to get user profile"
+// @Router /profile [get]
 func (h *ProfileHandler) GetProfileHandler(c *gin.Context) {
 	username, exists := c.Get("username")
 	if !exists {
