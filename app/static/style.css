@@ -1157,3 +1157,29 @@ input:focus {
     border-color: #8b5cf6 !important;
     box-shadow: 0 0 15px rgba(139, 92, 246, 0.4);
 }
+
+#checkout-form button[type="submit"] {
+    width: 100%;
+    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 10px;
+    font-size: 1.2em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 20px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+#checkout-form button[type="submit"]:hover {
+    background: linear-gradient(135deg, #7c3aed, #6d28d9);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(139, 92, 246, 0.4);
+}
+
+#checkout-form button[type="submit"]:active {
+    transform: translateY(0);
+}

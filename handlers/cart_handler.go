@@ -14,25 +14,31 @@ type CartItem struct {
 	Quantity  int `json:"quantity"`
 }
 
-func getCartKey(c *gin.Context) string {
+type CartHandler struct {
+	cookieSequre bool
+}
+
+func NewCartHandler(cookieSequre bool) *CartHandler {
+	return &CartHandler{cookieSequre: cookieSequre}
+}
+
+func (h *CartHandler) getCartKey(c *gin.Context) string {
 	token, exists := c.Get("token")
 	if exists && token != "" {
-		return fmt.Sprintf("cart:user:%s", token) // Используем токен как ключ
+		return fmt.Sprintf("cart:user:%s", token)
 	}
 
-	// Для анонимных пользователей используем session cookie
 	sessionID, err := c.Cookie("cart_session")
 	if err != nil || sessionID == "" {
-		// Создаем новую сессию
 		sessionID = generateSessionID()
-		c.SetCookie("cart_session", sessionID, 30*24*3600, "/", "", false, true)
+		c.SetCookie("cart_session", sessionID, 30*24*3600, "/", "", h.cookieSequre, true)
 	}
 	return fmt.Sprintf("cart:session:%s", sessionID)
 }
 
-func GetCartHandler(c *gin.Context) {
+func (h *CartHandler) GetCartHandler(c *gin.Context) {
 	redisClient := c.MustGet("redis").(*redis.Client)
-	cartKey := getCartKey(c)
+	cartKey := h.getCartKey(c)
 
 	cartData, err := redisClient.Get(cartKey).Result()
 
@@ -49,7 +55,7 @@ func GetCartHandler(c *gin.Context) {
 	c.JSON(200, gin.H{"items": cart})
 }
 
-func AddToCartHandler(c *gin.Context) {
+func (h *CartHandler) AddToCartHandler(c *gin.Context) {
 	redisClient := c.MustGet("redis").(*redis.Client)
 	var item CartItem
 
@@ -58,9 +64,8 @@ func AddToCartHandler(c *gin.Context) {
 		return
 	}
 
-	cartKey := getCartKey(c)
+	cartKey := h.getCartKey(c)
 
-	// Получаем текущую корзину
 	cartData, err := redisClient.Get(cartKey).Result()
 	var cart []CartItem
 
@@ -73,7 +78,6 @@ func AddToCartHandler(c *gin.Context) {
 		json.Unmarshal([]byte(cartData), &cart)
 	}
 
-	// Обновляем или добавляем товар
 	found := false
 	for i, cartItem := range cart {
 		if cartItem.ProductID == item.ProductID {
@@ -87,7 +91,6 @@ func AddToCartHandler(c *gin.Context) {
 		cart = append(cart, item)
 	}
 
-	// Сохраняем обратно в Redis
 	cartJSON, _ := json.Marshal(cart)
 	err = redisClient.Set(cartKey, cartJSON, 30*24*time.Hour).Err()
 
@@ -99,7 +102,7 @@ func AddToCartHandler(c *gin.Context) {
 	c.JSON(200, gin.H{"message": "Товар добавлен в корзину", "cart": cart})
 }
 
-func RemoveFromCartHandler(c *gin.Context) {
+func (h *CartHandler) RemoveFromCartHandler(c *gin.Context) {
 
 }
 

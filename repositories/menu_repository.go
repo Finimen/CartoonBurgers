@@ -4,7 +4,6 @@ import (
 	"CartoonBurgers/models"
 	"context"
 	"database/sql"
-	"fmt"
 	"os"
 	"path/filepath"
 
@@ -15,29 +14,9 @@ type MenuRerository struct {
 	db *sql.DB
 }
 
-func NewMenuRepository(ctx context.Context) (*MenuRerository, error) {
-	repo := &MenuRerository{}
-	err := repo.Init(ctx)
-	if err != nil {
-		fmt.Print("INIT ERROR")
-		return nil, err
-	}
-	return repo, nil
-}
-
-func (prod *MenuRerository) Init(ctx context.Context) error {
-	var db, err = sql.Open("sqlite", "./products.db")
-	if err != nil {
-		return err
-	}
-
-	if err := db.Ping(); err != nil {
-		return err
-	}
-
+func (prod *MenuRerository) Init(ctx context.Context, db *sql.DB) error {
 	var path = filepath.Join("..", "repositories", "migrations", "001_create_products_table_up.sql")
-	var req []byte
-	req, err = os.ReadFile(path)
+	var req, err = os.ReadFile(path)
 	if err != nil {
 		return err
 	}

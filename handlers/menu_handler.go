@@ -2,30 +2,24 @@ package handlers
 
 import (
 	"CartoonBurgers/repositories"
-	"CartoonBurgers/services"
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
-func GetMenuHandler(ctx *gin.Context) {
-	fmt.Println("MENU INITED")
-	menuRepository, err := repositories.NewMenuRepository(ctx)
+type MenuHandler struct {
+	menuRepo *repositories.MenuRerository
+}
 
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		fmt.Print("MENU ERROR MENU ERROR")
-		return
-	}
+func NewMenuHandler(repo *repositories.MenuRerository) *MenuHandler {
+	return &MenuHandler{menuRepo: repo}
+}
 
-	menuService := services.NewMenuService(menuRepository)
-
-	products, err := menuService.GetMenu(ctx)
+func (h *MenuHandler) GetMenu(ctx *gin.Context) {
+	products, err := h.menuRepo.GetAll(ctx)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-
 	ctx.JSON(http.StatusOK, products)
 }

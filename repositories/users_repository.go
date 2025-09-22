@@ -14,16 +14,21 @@ type UserRepository struct {
 	db *sql.DB
 }
 
-func NewUserRepository(ctx context.Context) (*UserRepository, error) {
-	var repo = &UserRepository{}
-	var err = repo.init(ctx)
-
+func (repo *UserRepository) Init(ctx context.Context, db *sql.DB) error {
+	var path = filepath.Join("..", "repositories", "migrations", "001_create_users_table_up.sql")
+	var com, err = os.ReadFile(path)
 	if err != nil {
-		fmt.Print("INIT ERROR")
-		return nil, err
+		return err
 	}
 
-	return repo, nil
+	repo.db = db
+	_, err = db.ExecContext(ctx, string(com))
+	if err != nil {
+		fmt.Print("EXEC ERROR", path)
+		return err
+	}
+
+	return nil
 }
 
 func (r *UserRepository) GetUserProfile(ctx context.Context, username string) (*models.User, error) {
@@ -54,32 +59,4 @@ func (repo *UserRepository) GetUserByUserame(ctx context.Context, name string) (
 func (repo *UserRepository) CreateUser(ctx context.Context, user models.User, hashedPassword string) error {
 	_, err := repo.db.ExecContext(ctx, "INSERT INTO users (username, passwordHash, email) VALUES (?, ?, ?)", user.Username, hashedPassword, user.Email)
 	return err
-}
-
-func (repo *UserRepository) init(ctx context.Context) error {
-	var db, err = sql.Open("sqlite", "./users.db")
-	if err != nil {
-		return err
-	}
-
-	if err := db.Ping(); err != nil {
-		fmt.Print("PING ERROR")
-		return err
-	}
-
-	var path = filepath.Join("..", "repositories", "migrations", "001_create_users_table_up.sql")
-	var com []byte
-	com, err = os.ReadFile(path)
-	if err != nil {
-		return err
-	}
-
-	repo.db = db
-	_, err = db.ExecContext(ctx, string(com))
-	if err != nil {
-		fmt.Print("EXEC ERROR", path)
-		return err
-	}
-
-	return nil
 }

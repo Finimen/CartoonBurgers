@@ -3,7 +3,6 @@ package handlers
 import (
 	"CartoonBurgers/repositories"
 	"CartoonBurgers/services"
-	"net/http"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -11,36 +10,25 @@ import (
 )
 
 type AuthHandlers struct {
-	Hasher *services.BcryptHasher
-	JwtKey []byte
+	Hasher   *services.BcryptHasher
+	JwtKey   []byte
+	userRepo *repositories.UserRepository
 }
 
-func NewAuthHandlers(jwtKey string) *AuthHandlers {
+func NewAuthHandlers(jwtKey string, userRepo *repositories.UserRepository) *AuthHandlers {
 	return &AuthHandlers{
-		Hasher: &services.BcryptHasher{},
-		JwtKey: []byte(jwtKey),
+		Hasher:   &services.BcryptHasher{},
+		JwtKey:   []byte(jwtKey),
+		userRepo: userRepo,
 	}
 }
-
 func (a *AuthHandlers) GetRegisterHandler(c *gin.Context) {
-	repo, err := repositories.NewUserRepository(c)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "DB Init Failed: " + err.Error()})
-		return
-	}
-
-	registerHandler := services.NewRegisterHandler(a.Hasher, *repo)
+	registerHandler := services.NewRegisterHandler(a.Hasher, *a.userRepo)
 	registerHandler.RegisterHandlerGin(c)
 }
 
 func (a *AuthHandlers) GetLoginHandler(c *gin.Context) {
-	repo, err := repositories.NewUserRepository(c)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "DB Init Failed: " + err.Error()})
-		return
-	}
-
-	loginHandler := services.NewLoginHandler(a.Hasher, *repo, a.JwtKey)
+	loginHandler := services.NewLoginHandler(a.Hasher, *a.userRepo, a.JwtKey)
 	loginHandler.LoginHandlerGin(c)
 }
 
@@ -54,7 +42,6 @@ func (a *AuthHandlers) OptionalAuth() gin.HandlerFunc {
 		if tokenStr != "" {
 			tokenStr = strings.TrimPrefix(tokenStr, "Bearer ")
 
-			// Пытаемся распарсить токен
 			token, err := jwt.Parse(tokenStr, func(t *jwt.Token) (interface{}, error) {
 				return a.JwtKey, nil
 			})
